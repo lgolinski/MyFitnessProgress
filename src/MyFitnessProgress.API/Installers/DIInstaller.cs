@@ -12,7 +12,7 @@ namespace MyFitnessProgress.API.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IProductsService, ProductsService>();
-            services.AddScoped<IProductRepository, InMemoryProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
         }
     }
 }

@@ -6,5 +6,6 @@ namespace MyFitnessProgress.Infrastructure.Repositories.Abstraction
     public interface IProductRepository
     {
         List<Product> GetAll();
+        int Add(Product product);
     }
 }

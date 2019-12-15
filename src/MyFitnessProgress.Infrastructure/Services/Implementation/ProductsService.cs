@@ -22,5 +22,15 @@ namespace MyFitnessProgress.Infrastructure.Services.Implementation
 
             return _mapper.Map<List<Product>, List<ProductDto>>(products);
         }
+
+        public bool Add(ProductDto newProduct, int userId)
+        {
+            var productToAdd = _mapper.Map<ProductDto, Product>(newProduct);
+            productToAdd.Unit = null;
+
+            var idCreated = _productRepository.Add(productToAdd);
+
+            return idCreated > 0;
+        }
     }
 }

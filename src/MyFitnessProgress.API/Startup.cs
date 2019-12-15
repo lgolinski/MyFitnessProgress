@@ -7,6 +7,7 @@ using MyFitnessProgress.API.Settings;
 using MyFitnessProgress.API.Extensions;
 using AutoMapper;
 using MyFitnessProgress.Infrastructure;
+using MyFitnessProgress.Infrastructure.Services.Abstraction;
 
 namespace MyFitnessProgress.API
 {
@@ -55,6 +56,19 @@ namespace MyFitnessProgress.API
             {
                 endpoints.MapControllers();
             });
+
+            var databaseSettings = new DatabaseSettings();
+            Configuration.GetSection(nameof(DatabaseSettings)).Bind(databaseSettings);
+
+            if (env.IsDevelopment() && databaseSettings.SeedData)
+            {
+                IDataInitializer dataInitializer;
+                using (var service = app.ApplicationServices.CreateScope())
+                {
+                    dataInitializer = service.ServiceProvider.GetService<IDataInitializer>();
+                    dataInitializer.SeedData();
+                }
+            }
         }
     }
 }

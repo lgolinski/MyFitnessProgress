@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyFitnessProgress.API.Settings;
 using MyFitnessProgress.Infrastructure.Mappings;
+using MyFitnessProgress.Infrastructure.Services.Abstraction;
+using MyFitnessProgress.Infrastructure.Services.Implementation;
 
 namespace MyFitnessProgress.API.Installers
 {
@@ -15,11 +17,13 @@ namespace MyFitnessProgress.API.Installers
 
             services.AddDbContext<DietDbContext>(options =>
             {
-                if (databaseSettings.UseInMemory)
+                if (databaseSettings.UseInMemoryDatabase)
                     options.UseInMemoryDatabase(databaseSettings.DatabaseName);
                 else
                     options.UseSqlServer(databaseSettings.ConnectionString);
             });
+
+            services.AddScoped<IDataInitializer, DataInitializer>();
         }
     }
 }
