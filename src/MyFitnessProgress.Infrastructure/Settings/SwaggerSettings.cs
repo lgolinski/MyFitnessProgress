@@ -1,6 +1,6 @@
-namespace MyFitnessProgress.API.Settings
+namespace MyFitnessProgress.Infrastructure.Settings
 {
-    public class SwaggerSettings
+    public class SwaggerSettings : ISettings
     {
         public string JsonRoute { get; set; }
         public string Description { get; set; }

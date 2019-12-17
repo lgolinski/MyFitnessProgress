@@ -4,6 +4,6 @@ namespace MyFitnessProgress.Infrastructure.Services.Abstraction
 {
     public interface IDataInitializer
     {
-        void SeedData();
+        void PrepareDatabase();
     }
 }

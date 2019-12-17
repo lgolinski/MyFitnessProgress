@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyFitnessProgress.API.Settings;
 using MyFitnessProgress.API.Extensions;
 using AutoMapper;
 using MyFitnessProgress.Infrastructure;
 using MyFitnessProgress.Infrastructure.Services.Abstraction;
+using MyFitnessProgress.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 
 namespace MyFitnessProgress.API
 {
@@ -25,6 +26,7 @@ namespace MyFitnessProgress.API
         {
             services.InstallServicesInAssembly(Configuration);
             services.AddControllers();
+            services.BindSettings(Configuration);
             services.AddAutoMapper(typeof(Sample));
         }
 
@@ -57,17 +59,12 @@ namespace MyFitnessProgress.API
                 endpoints.MapControllers();
             });
 
-            var databaseSettings = new DatabaseSettings();
-            Configuration.GetSection(nameof(DatabaseSettings)).Bind(databaseSettings);
-
-            if (env.IsDevelopment() && databaseSettings.SeedData)
+            // Database creations, migrations, seeding data.
+            using (var service = app.ApplicationServices.CreateScope())
             {
-                IDataInitializer dataInitializer;
-                using (var service = app.ApplicationServices.CreateScope())
-                {
-                    dataInitializer = service.ServiceProvider.GetService<IDataInitializer>();
-                    dataInitializer.SeedData();
-                }
+                service.ServiceProvider
+                    .GetService<IDataInitializer>()
+                    .PrepareDatabase();
             }
         }
     }

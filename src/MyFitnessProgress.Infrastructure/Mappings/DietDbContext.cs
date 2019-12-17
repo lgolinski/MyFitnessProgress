@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using MyFitnessProgress.Core.Domain.Diet;
 using MyFitnessProgress.Infrastructure.Extensions.EntityFramework;
-using MyFitnessProgress.Infrastructure.Mappings.diet;
 
 namespace MyFitnessProgress.Infrastructure.Mappings
 {
@@ -23,11 +22,9 @@ namespace MyFitnessProgress.Infrastructure.Mappings
         {
             // set default schema for tables.
             modelBuilder.HasDefaultSchema("diet");
-            modelBuilder.ApplyConfiguration(new UnitMappings());
-            modelBuilder.ApplyConfiguration(new ProductMappings());
-            modelBuilder.ApplyConfiguration(new MacroMappings());
-            modelBuilder.ApplyConfiguration(new PictureMappings());
-            modelBuilder.ApplyConfiguration(new ProductCategoryMappings());
+
+            // Add Entity Type Configurations.
+            modelBuilder.AddMappings();
 
             // Add CreationDate and LastModify for all models in db.
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MyFitnessProgress.Infrastructure.DTO;
 using MyFitnessProgress.Infrastructure.Mappings;
 using MyFitnessProgress.Infrastructure.Services.Abstraction;
+using MyFitnessProgress.Infrastructure.Settings;
 
 namespace MyFitnessProgress.Infrastructure.Services.Implementation
 {
@@ -12,19 +14,34 @@ namespace MyFitnessProgress.Infrastructure.Services.Implementation
     {
         private readonly DietDbContext _dbContext;
         private readonly IProductsService _productsService;
-        public DataInitializer(DietDbContext dbContext, IProductsService productsService)
+        private readonly IOptions<DatabaseSettings> _dbSettings;
+        public DataInitializer(DietDbContext dbContext, IProductsService productsService, IOptions<DatabaseSettings> dbSettings)
         {
             _dbContext = dbContext;
             _productsService = productsService;
+            _dbSettings = dbSettings;
         }
-        public void SeedData()
+
+        public void PrepareDatabase()
         {
-            _dbContext.Database.EnsureCreated();
+            ExecuteMigrations();
+
+            if (_dbSettings.Value.SeedData)
+                SeedData();
+        }
+        private void ExecuteMigrations()
+        {
+            // Create Initial database.
+            if (_dbSettings.Value.UseInMemoryDatabase)
+                _dbContext.Database.EnsureCreated();
 
             // migrate database with all migration scripts.
             // Note: Migrations can be used only on real database. Not in In Memory Database.
-            // _dbContext.Database.Migrate();
-
+            else if (!_dbSettings.Value.UseInMemoryDatabase && _dbSettings.Value.UseMigrations)
+                _dbContext.Database.Migrate();
+        }
+        private void SeedData()
+        {
             // create fake data for testing InMemoryDatabase.
             var products = GenerateNewProducts();
             foreach (var item in products)

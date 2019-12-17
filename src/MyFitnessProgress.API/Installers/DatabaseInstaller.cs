@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyFitnessProgress.API.Settings;
 using MyFitnessProgress.Infrastructure.Mappings;
 using MyFitnessProgress.Infrastructure.Services.Abstraction;
 using MyFitnessProgress.Infrastructure.Services.Implementation;
+using MyFitnessProgress.Infrastructure.Settings;
 
 namespace MyFitnessProgress.API.Installers
 {
@@ -13,6 +13,7 @@ namespace MyFitnessProgress.API.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             var databaseSettings = new DatabaseSettings();
+            services.Configure<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)));
             configuration.GetSection(nameof(DatabaseSettings)).Bind(databaseSettings);
 
             services.AddDbContext<DietDbContext>(options =>

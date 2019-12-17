@@ -10,7 +10,7 @@ namespace MyFitnessProgress.Core.Domain.Diet
         public Macro Macro { get; set; }
         public int UnitId { get; set; }
         public Unit Unit { get; set; }
-        public int PictureId { get; set; }
+        public int? PictureId { get; set; }
         public Picture Picture { get; set; }
         public int? ProductCategoryId { get; set; }
         public ProductCategory ProductCategory { get; set; }
