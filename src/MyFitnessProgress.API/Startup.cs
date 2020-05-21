@@ -1,15 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using MyFitnessProgress.API.Extensions;
+using AutoMapper;
+using MyFitnessProgress.Infrastructure;
+using MyFitnessProgress.Infrastructure.Services.Abstraction;
+using MyFitnessProgress.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 
 namespace MyFitnessProgress.API
 {
@@ -25,7 +24,10 @@ namespace MyFitnessProgress.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.InstallServicesInAssembly(Configuration);
             services.AddControllers();
+            services.BindSettings(Configuration);
+            services.AddAutoMapper(typeof(Sample));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,10 +44,28 @@ namespace MyFitnessProgress.API
 
             app.UseAuthorization();
 
+            var swaggerSettings = new SwaggerSettings();
+            Configuration.GetSection(nameof(SwaggerSettings)).Bind(swaggerSettings);
+
+            // Swagger Middleware.
+            app.UseSwagger(option => { option.RouteTemplate = swaggerSettings.JsonRoute; });
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint(swaggerSettings.UiEndpoint, swaggerSettings.Description);
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            // Database creations, migrations, seeding data.
+            using (var service = app.ApplicationServices.CreateScope())
+            {
+                service.ServiceProvider
+                    .GetService<IDataInitializer>()
+                    .PrepareDatabase();
+            }
         }
     }
 }

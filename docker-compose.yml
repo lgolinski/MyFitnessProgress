@@ -1,0 +1,11 @@
+version: '2'
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: mssql
+    ports:
+      - "1401:1433"
+    environment:
+      SA_PASSWORD: "ZAQ!@WSXCDE#"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
